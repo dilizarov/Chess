@@ -55,7 +55,7 @@ class Board
   end
 
   def square_occupied?(row, col) #until test out, keep parameters
-    self[row, col] != '*'
+    self[row, col].is_a?(Piece)
   end
 
   def [](row, col)
@@ -76,10 +76,6 @@ class Piece
   def initialize(color, position, grid)
     @color, @position, @grid = color, position, grid
   end
-
-end
-
-module SlidingPiece
 
   def path(final_position) #Refactor later
     return nil unless within_board?(final_position)
@@ -106,19 +102,13 @@ module SlidingPiece
       j += h_step
     end
 
-    path
-
   end
 
-  # def valid_move?
-#
-#   end
+  def execute_move?
+
+  end
 
   def intervening_piece?
-
-  end
-
-  def teammate?
 
   end
 
@@ -126,12 +116,15 @@ module SlidingPiece
 
   end
 
-  def within_board?
+  def within_board?(final_position)
+    row = final_position[0]
+    column = final_position[0]
+    row.between?(0,7) && column.between?(0,7)
+  end
 
 end
 
 class Rook < Piece
-  include SlidingPiece
 
   def path_permissible?(delta_x, delta_y)
     (delta_y == 0) ^ (delta_x == 0)
@@ -143,7 +136,6 @@ class Rook < Piece
 end
 
 class Bishop < Piece
-  include SlidingPiece
 
   def path_permissible?(delta_x, delta_y)
     return false if (delta_x == 0 && delta_y == 0)
@@ -156,7 +148,6 @@ class Bishop < Piece
 end
 
 class Queen < Piece
-  include SlidingPiece
 
   def path_permissible?(delta_x, delta_y)
     return false if (delta_x == 0 && delta_y == 0)
@@ -169,7 +160,6 @@ class Queen < Piece
 end
 
 class King < Piece
-  include SlidingPiece
 
   def path_permissible?(delta_x, delta_y)
     return false if (delta_x == 0 && delta_y == 0)
@@ -188,7 +178,6 @@ class Pawn < Piece
 end
 
 class Knight < Piece
-  include SlidingPiece
 
   def path_permissible?(delta_x, delta_y)
     [delta_x.abs, delta_y.abs].sort == [1,2]
