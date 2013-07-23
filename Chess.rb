@@ -81,67 +81,32 @@ end
 
 module SlidingPiece
 
-  def horizontal(final_position)
-    horizontal = []
+  def path(final_position) #Refactor later
+    return nil unless within_board?(final_position)
+
+    path = []
 
     delta_x = final_position[0] - position[0]
     delta_y = final_position[1] - position[1]
 
-    return nil unless delta_x == 0
+    return nil unless path_permissible?(delta_x, delta_y)
 
-    h_step = delta_y/(delta_y.abs)
+    delta_x == 0 ? v_step = 0 : v_step = (delta_x/delta_x.abs)
+    delta_y == 0 ? h_step = 0 : h_step = (delta_y/delta_y.abs)
 
-    j = position[1]
-
-    until horizontal.include?(final_position)
-      horizontal << [position[0], j + h_step]
-      j += h_step
-    end
-
-    horizontal
-  end
-
-  def vertical(final_position)
-    vertical = []
-
-    delta_x = final_position[0] - position[0]
-    delta_y = final_position[1] - position[1]
-
-    return nil unless delta_y == 0
-
-    v_step = delta_x/(delta_x.abs)
-
-    i = position[0]
-
-    until vertical.include?(final_position)
-      vertical << [i + v_step, position[1]]
-      i += v_step
-    end
-
-    vertical
-  end
-
-  def diagonal(final_position)
-    diagonal = []
-
-    delta_x = final_position[0] - position[0]
-    delta_y = final_position[1] - position[1]
-
-    return nil unless delta_x.abs == delta_y.abs
-
-    v_step = delta_x/(delta_x.abs)
-    h_step = delta_y/(delta_y.abs)
+    v_step = delta_x if delta_x.abs == 2
+    h_step = delta_y if delta_y.abs == 2
 
     i = position[0]
     j = position[1]
 
-    until diagonal.include?(final_position)
-      diagonal << [i + v_step, j + h_step]
+    until path.include?(final_position)
+      path << [i + v_step, j + h_step]
       i += v_step
       j += h_step
     end
 
-    diagonal
+    path
 
   end
 
@@ -161,10 +126,16 @@ module SlidingPiece
 
   end
 
+  def within_board?
+
 end
 
 class Rook < Piece
   include SlidingPiece
+
+  def path_permissible?(delta_x, delta_y)
+    (delta_y == 0) ^ (delta_x == 0)
+  end
 
   def to_s
     "R"
@@ -173,6 +144,12 @@ end
 
 class Bishop < Piece
   include SlidingPiece
+
+  def path_permissible?(delta_x, delta_y)
+    return false if (delta_x == 0 && delta_y == 0)
+    delta_x.abs == delta_y.abs
+  end
+
   def to_s
     "B"
   end
@@ -180,13 +157,25 @@ end
 
 class Queen < Piece
   include SlidingPiece
+
+  def path_permissible?(delta_x, delta_y)
+    return false if (delta_x == 0 && delta_y == 0)
+    ((delta_y == 0) ^ (delta_x == 0) || (delta_x.abs == delta_y.abs))
+  end
+
   def to_s
     "Q"
   end
 end
 
 class King < Piece
-  # include SlidingPiece
+  include SlidingPiece
+
+  def path_permissible?(delta_x, delta_y)
+    return false if (delta_x == 0 && delta_y == 0)
+    !(delta_x.abs > 1 || delta_y.abs > 1)
+  end
+
   def to_s
     "K"
   end
@@ -199,6 +188,12 @@ class Pawn < Piece
 end
 
 class Knight < Piece
+  include SlidingPiece
+
+  def path_permissible?(delta_x, delta_y)
+    [delta_x.abs, delta_y.abs].sort == [1,2]
+  end
+
   def to_s
     "N"
   end
