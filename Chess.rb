@@ -81,28 +81,53 @@ end
 
 module SlidingPiece
 
-  def horizontal
+  def horizontal(final_position)
     horizontal = []
 
-    @grid[i].each { |lala| horizontal << lala }
+    row = position[0]
+
+    self.grid[row].each { |square| horizontal << square }
 
     horizontal
   end
 
-  def vertical
+  def vertical(final_position)
     vertical = []
 
+    square = position[1]
 
+    self.grid.each { |row| vertical << row[square] }
+
+    vertical
+  end
+
+  def diagonal(final_position)
+    diagonal = []
+
+    delta_x = final_position[0] - position[0]
+    delta_y = final_position[1] - position[1]
+
+    return nil unless delta_x.abs == delta_y.abs
+
+    v_step = delta_x/(delta_x.abs)
+    h_step = delta_y/(delta_y.abs)
+
+    i = position[0]
+    j = position[1]
+
+    until diagonal.include?(final_position)
+      diagonal << [i + v_step, j + h_step]
+      i += v_step
+      j += h_step
+    end
+
+    diagonal
 
   end
 
-  def diagonals
-
-  end
-
-  def valid_move?
-
-  end
+  # def valid_move?
+#
+#   end
 
   def intervening_piece?
 
