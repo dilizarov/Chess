@@ -1,7 +1,6 @@
 class Board
-#   DEFAULT_PIECES = [K, Q, R, etc]
 
-   attr_reader :pieces, :grid
+  attr_reader :grid, #:pieces
 
   def Board.generate_board
     grid = (0...8).map { ['*'] * 8 }
@@ -27,30 +26,29 @@ class Board
     grid
   end
 
-  def assess_board
-    @pieces = []
-    self.each_index do |row|
-      row.each_index do |col|
-        square = self[row][col]
-       @pieces << square unless square.nil?
-      end
-    end
-  end
+#   def assess_grid
+#     @pieces = []
+#     # @grid.each_index do |row|
+# #       row.each_index do |col|
+# #         square = @grid[row][col]
+# #        @pieces << square unless square.nil?
+# #       end
+# #     end
+#     @grid.flatten.each
+#
+#   end
 
   def display_board
     print '  '
-    (0...@grid.length).each do |i|
-      print i.to_s(8) + " "
-    end
-    puts ""
+    (0...@grid.length).each { |i| print i.to_s(8) + " " }
 
+    puts ""
     @grid.flatten.each_with_index do |piece, i|
       print (i /@grid.length).to_s(8) + " " if (i % @grid.length == 0)
 
       print piece.to_s + " "
-      if (i + 1) % @grid.length == 0
-        puts ""
-      end
+      puts "" if (i + 1) % @grid.length == 0
+
     end
 
     return
@@ -60,13 +58,13 @@ class Board
     self[row, col] != '*'
   end
 
-  def [](row, col) #Possibly error-prone
+  def [](row, col)
     @grid[row][col]
   end
 
   def initialize
     @grid = Board.generate_board
-    #@pieces = @grid.assess_board
+    #@pieces = self.assess_grid
   end
 
 
