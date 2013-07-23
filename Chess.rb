@@ -1,43 +1,53 @@
 class Board
 #   DEFAULT_PIECES = [K, Q, R, etc]
 
-   attr_reader :pieces, :squares
+   attr_reader :pieces, :grid
 
   def Board.generate_board
-    @grid = (0...8).map { [nil] * 8 }
+    grid = (0...8).map { ['*'] * 8 }
 
-    @grid[0] = [Rook.new(:black, [0,0]), Knight.new(:black, [0, 1]),
+    grid[0] = [Rook.new(:black, [0,0]), Knight.new(:black, [0, 1]),
                 Bishop.new(:black, [0, 2]), Queen.new(:black, [0,3]),
                 King.new(:black, [0, 4]), Bishop.new(:black, [0,5]),
-                Knight.new(:black, [0, 6), Rook.new(:black, [0,7])]
+                Knight.new(:black, [0, 6]), Rook.new(:black, [0,7])]
 
-    @grid[7] = [Rook.new(:white, [7,0]), Knight.new(:white, [7, 1]),
+    grid[7] = [Rook.new(:white, [7,0]), Knight.new(:white, [7, 1]),
                 Bishop.new(:white, [7, 2]), Queen.new(:white, [7,3]),
                 King.new(:white, [7, 4]), Bishop.new(:white, [7,5]),
-                Knight.new(:white, [7, 6), Rook.new(:white, [7,7])]
+                Knight.new(:white, [7, 6]), Rook.new(:white, [7,7])]
 
-    @grid[1].each_with_index do |square, i|
-      square = Pawn.new(:black, [1, i])
+    grid[1].each_index do |i|
+      grid[1][i] = Pawn.new(:black, [1, i])
     end
 
-    @grid[6].each_with_index do |square, i|
-      square = Pawn.new(:white, [6, i])
+    grid[6].each_index do |i|
+      grid[6][i] = Pawn.new(:white, [6, i])
     end
+
+    grid
   end
 
-  def Board.assess_board
+  def assess_board
     @pieces = []
-    @grid.each do |row|
-      row.each do |col|
-        square = @grid[row][col]
+    self.each_index do |row|
+      row.each_index do |col|
+        square = self[row][col]
        @pieces << square unless square.nil?
       end
     end
   end
 
+  def square_occupied?(row, col) #until test out, keep parameters
+    self[row, col] != '*'
+  end
+
+  def [](row, col) #Possibly error-prone
+    @grid[row][col]
+  end
+
   def initialize
-    @board = Board.generate_board
-    @pieces = Board.assess_board
+    @grid = Board.generate_board
+    #@pieces = @grid.assess_board
   end
 
 
