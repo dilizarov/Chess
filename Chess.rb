@@ -84,10 +84,23 @@ module SlidingPiece
   def horizontal(final_position)
     horizontal = []
 
-    row = position[0]
+    delta_x = final_position[0] - position[0]
+    delta_y = final_position[1] - position[1]
 
-    self.grid[row].each { |square| horizontal << square }
+    return nil unless delta_x == 0
 
+    h_step = delta_y/(delta_y.abs)
+
+    j = position[1]
+
+    until horizontal.include?(final_position)
+      horizontal << [position[0], j + h_step]
+      j += h_step
+    end
+    # row = position[0]
+    #
+    # self.grid[row].each { |square| horizontal << square }
+    #
     horizontal
   end
 
