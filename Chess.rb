@@ -37,6 +37,25 @@ class Board
     end
   end
 
+  def display_board
+    print '  '
+    (0...@grid.length).each do |i|
+      print i.to_s(8) + " "
+    end
+    puts ""
+
+    @grid.flatten.each_with_index do |piece, i|
+      print (i /@grid.length).to_s(8) + " " if (i % @grid.length == 0)
+
+      print piece.to_s + " "
+      if (i + 1) % @grid.length == 0
+        puts ""
+      end
+    end
+
+    return
+  end
+
   def square_occupied?(row, col) #until test out, keep parameters
     self[row, col] != '*'
   end
