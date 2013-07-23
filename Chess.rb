@@ -1,26 +1,26 @@
 class Board
 
-  attr_reader :grid, #:pieces
+  attr_reader :grid #:pieces
 
   def Board.generate_board
     grid = (0...8).map { ['*'] * 8 }
 
-    grid[0] = [Rook.new(:black, [0,0]), Knight.new(:black, [0, 1]),
-                Bishop.new(:black, [0, 2]), Queen.new(:black, [0,3]),
-                King.new(:black, [0, 4]), Bishop.new(:black, [0,5]),
-                Knight.new(:black, [0, 6]), Rook.new(:black, [0,7])]
+    grid[0] = [Rook.new(:black, [0,0], grid), Knight.new(:black, [0, 1], grid),
+                Bishop.new(:black, [0, 2], grid), Queen.new(:black, [0,3], grid),
+                King.new(:black, [0, 4], grid), Bishop.new(:black, [0,5], grid),
+                Knight.new(:black, [0, 6], grid), Rook.new(:black, [0,7], grid)]
 
-    grid[7] = [Rook.new(:white, [7,0]), Knight.new(:white, [7, 1]),
-                Bishop.new(:white, [7, 2]), Queen.new(:white, [7,3]),
-                King.new(:white, [7, 4]), Bishop.new(:white, [7,5]),
-                Knight.new(:white, [7, 6]), Rook.new(:white, [7,7])]
+    grid[7] = [Rook.new(:white, [7,0], grid), Knight.new(:white, [7, 1], grid),
+                Bishop.new(:white, [7, 2], grid), Queen.new(:white, [7,3], grid),
+                King.new(:white, [7, 4], grid), Bishop.new(:white, [7,5], grid),
+                Knight.new(:white, [7, 6], grid), Rook.new(:white, [7,7], grid)]
 
     grid[1].each_index do |i|
-      grid[1][i] = Pawn.new(:black, [1, i])
+      grid[1][i] = Pawn.new(:black, [1, i], grid)
     end
 
     grid[6].each_index do |i|
-      grid[6][i] = Pawn.new(:white, [6, i])
+      grid[6][i] = Pawn.new(:white, [6, i], grid)
     end
 
     grid
@@ -71,15 +71,50 @@ class Board
 end
 
 class Piece
-  attr_accessor :color, :position
+  attr_accessor :color, :position, :grid
 
-  def initialize(color, position)
-    @color, @position = color, position
+  def initialize(color, position, grid)
+    @color, @position, @grid = color, position, grid
   end
 
 end
 
 module SlidingPiece
+
+  def horizontal
+    horizontal = []
+
+    @grid[i].each { |lala| horizontal << lala }
+
+    horizontal
+  end
+
+  def vertical
+    vertical = []
+
+
+
+  end
+
+  def diagonals
+
+  end
+
+  def valid_move?
+
+  end
+
+  def intervening_piece?
+
+  end
+
+  def teammate?
+
+  end
+
+  def own_king_checked?
+
+  end
 
 end
 
