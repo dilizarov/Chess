@@ -15,7 +15,7 @@ class Board
 
     grid[6] = (8...16).map { |i| teams[1][i] }
 
-    grid
+    [grid, teams]
   end
 
   def Board.make_teams(grid)
@@ -62,14 +62,14 @@ class Board
 
   def to_s
     print '  '
-    (0...@grid.length).each { |i| print i.to_s(8) + " " }
+    (0...@grid[0].length).each { |i| print i.to_s(8) + " " }
 
     puts ""
-    @grid.flatten.each_with_index do |piece, i|
-      print (i /@grid.length).to_s(8) + " " if (i % @grid.length == 0)
+    @grid[0].flatten.each_with_index do |piece, i|
+      print (i /@grid[0].length).to_s(8) + " " if (i % @grid[0].length == 0)
 
       print piece.to_s + " "
-      puts "" if (i + 1) % @grid.length == 0
+      puts "" if (i + 1) % @grid[0].length == 0
 
     end
 
@@ -77,7 +77,7 @@ class Board
   end
 
   def [](row, col)
-    @grid[row][col]
+    @grid[0][row][col]
   end
 
   def initialize
@@ -92,20 +92,25 @@ class Piece
   attr_accessor :color, :position, :grid# reformat later to include :final_position
 
   def initialize(color, position, grid)
-    @color, @position, @grid = color, position, grid
+    @color, @position, @grid = color, position, grid[0]
+    @teams = { :black => grid[1][0],
+               :white => grid[1][1],
+               :blackking => grid[1][0][4],
+               :whiteking => grid[1][1][4]
+             }
   end
 
-  def team
-    bteam = []
-    wteam = []
-    (grid[0] + grid[1]).each { |piece| bteam << piece }
-    (grid[6] + grid[7]).each { |piece| wteam << piece }
-    @teams = { :black => bteam,
-              :white => wteam,
-              :blackking => bteam[4],
-              :whiteking => wteam[4]
-            }
-  end
+  # def team
+#     bteam = []
+#     wteam = []
+#     (grid[0] + grid[1]).each { |piece| bteam << piece }
+#     (grid[6] + grid[7]).each { |piece| wteam << piece }
+#     @teams = { :black => bteam,
+#               :white => wteam,
+#               :blackking => bteam[4],
+#               :whiteking => wteam[4]
+#             }
+#   end
 
   def path(final_position) #Refactor later
     return nil unless within_board?(final_position)
@@ -138,8 +143,11 @@ class Piece
   end
 
   def move(final_position)
+    p final_position
     if execute_move?(final_position)
+      p @grid
       @grid[final_position[0]][final_position[1]] = @grid[position[0]][position[1]]
+      @grid[position[0]][position[1]]
       @grid[position[0]][position[1]] = '*'
       @position = final_position # MH
     end
@@ -165,12 +173,12 @@ class Piece
    end
 
   def own_king_checked?
-    p team[:white]
-    p team[:black]
-    if team[:white].include?(self)
-      return team[:black].any? { |piece| piece.path_clear?(team[:whiteking].position) }
-    elsif team[:black].include?(self)
-      return team[:white].any? { |piece| piece.path_clear?(team[:blackking].position) }
+    p @teams[:white]
+    p @teams[:black]
+    if @teams[:white].include?(self)
+      return @teams[:black].any? { |piece| piece.path_clear?(@teams[:whiteking].position) }
+    elsif @teams[:black].include?(self)
+      return @teams[:white].any? { |piece| piece.path_clear?(@teams[:blackking].position) }
     end
 
       # if team[:white].include?(self)
