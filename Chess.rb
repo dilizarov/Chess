@@ -38,7 +38,7 @@ class Board
 #
 #   end
 
-  def display_board
+  def to_s
     print '  '
     (0...@grid.length).each { |i| print i.to_s(8) + " " }
 
@@ -99,13 +99,30 @@ class Piece
 
   end
 
-  def execute_move?
+  def stationary?(final_position)
+    position == final_position
+  end
 
+  def move(final_position)
+    if execute_move?(final_position)
+      @grid[final_position[0]][final_position[1]] = @grid[position[0]][position[1]]
+      @grid[position[0]][position[1]] = '*'
+      @position = final_position # MH
+    end
+  end
+
+  def execute_move?(final_position)
+    return false if stationary?(final_position)
+    return false unless within_board?(final_position)
+    return false if intervening_piece?(final_position)
+    return false if destination_friend?(final_position)
+
+    true
   end
 
    def intervening_piece?(final_position) #works
+     return true if self.path(final_position) == nil
      path = self.path(final_position)[0...-1]
-     return true if path == nil
      path.any? { |point| grid[point[0]][point[1]].is_a?(Piece) }
    end
 
@@ -199,11 +216,28 @@ class Pawn < Piece
     end
   end
 
+  def attacking?(final_position)
+
+    delta_y = final_position[1] - position[1]
+
+    if delta_y != 0
+      return false unless square_occupied?(final_position)
+      return true unless destination_friend?(final_position)
+    else
+      return false if square_occupied?(final_position)
+    end
+
+    true
+  end
+
+  def execute_move?(final_position)
+    return false unless attacking?(final_position)
+    super(final_position)
+  end
+
   def at_home_row?
     color == :black ? position[0] == 1 : position[0] == 6
   end
-
-
 
   def to_s
     "P"
