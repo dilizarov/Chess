@@ -73,6 +73,18 @@ class Piece
     @color, @position, @grid = color, position, grid
   end
 
+  def team
+    bteam = []
+    wteam = []
+    (grid[0] + grid[1]).each { |piece| bteam << piece }
+    (grid[6] + grid[7]).each { |piece| wteam << piece }
+    @teams = { :black => bteam,
+              :white => wteam,
+              :blackking => bteam[4],
+              :whiteking => wteam[4]
+            }
+  end
+
   def path(final_position) #Refactor later
     return nil unless within_board?(final_position)
 
@@ -126,8 +138,36 @@ class Piece
      path.any? { |point| grid[point[0]][point[1]].is_a?(Piece) }
    end
 
-  def own_king_checked?
+   def path_clear?(final_position)
+      !(intervening_piece?(final_position))
+   end
 
+  def own_king_checked?
+    p team[:white]
+    p team[:black]
+    if team[:white].include?(self)
+      return team[:black].any? { |piece| piece.path_clear?(team[:whiteking].position) }
+    elsif team[:black].include?(self)
+      return team[:white].any? { |piece| piece.path_clear?(team[:blackking].position) }
+    end
+
+      # if team[:white].include?(self)
+#        all_paths = team[:black].map { |piece| piece.path(team[:whiteking].position) }
+#        all_paths.reject! { |path| path.nil? }
+#        all_paths.each do |path|
+#          return true if (path[0...-1].none? { |row, column| grid[row][column].is_a?(Piece) })
+#        end
+#
+#      elsif team[:black].include?(self)
+#        all_paths = team[:white].map { |piece| piece.path(team[:blackking].position) }
+#        all_paths.reject! { |path| path.nil? }
+#        all_paths.each do |path|
+#          p path
+#          return true if (path[0...-1].none? { |row, column| grid[row][column].is_a?(Piece) })
+#        end
+#      end
+
+     false
   end
 
   def destination_friend?(final_position) #works
