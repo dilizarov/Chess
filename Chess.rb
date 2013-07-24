@@ -5,25 +5,47 @@ class Board
   def Board.generate_board
     grid = (0...8).map { ['*'] * 8 }
 
-    grid[0] = [Rook.new(:black, [0,0], grid), Knight.new(:black, [0, 1], grid),
-                Bishop.new(:black, [0, 2], grid), Queen.new(:black, [0,3], grid),
-                King.new(:black, [0, 4], grid), Bishop.new(:black, [0,5], grid),
-                Knight.new(:black, [0, 6], grid), Rook.new(:black, [0,7], grid)]
+    teams = make_teams(grid)
 
-    grid[7] = [Rook.new(:white, [7,0], grid), Knight.new(:white, [7, 1], grid),
-                Bishop.new(:white, [7, 2], grid), Queen.new(:white, [7,3], grid),
-                King.new(:white, [7, 4], grid), Bishop.new(:white, [7,5], grid),
-                Knight.new(:white, [7, 6], grid), Rook.new(:white, [7,7], grid)]
+    grid[0] = 8.times.map { |i| teams[0][i] }
 
-    grid[1].each_index do |i|
-      grid[1][i] = Pawn.new(:black, [1, i], grid)
-    end
+    grid[7] = 8.times.map { |i| teams[1][i] }
 
-    grid[6].each_index do |i|
-      grid[6][i] = Pawn.new(:white, [6, i], grid)
-    end
+    grid[1] = (8...16).map { |i| teams[0][i] }
+
+    grid[6] = (8...16).map { |i| teams[1][i] }
 
     grid
+  end
+
+  def Board.make_teams(grid)
+
+    bteam = [Rook.new(:black, [0,0], grid), Knight.new(:black, [0, 1], grid),
+            Bishop.new(:black, [0, 2], grid), Queen.new(:black, [0,3], grid),
+            King.new(:black, [0, 4], grid), Bishop.new(:black, [0,5], grid),
+            Knight.new(:black, [0, 6], grid), Rook.new(:black, [0,7], grid)]
+
+    8.times do |i|
+
+      bteam << Pawn.new(:black, [1, i], grid)
+
+    end
+
+
+    wteam = [Rook.new(:white, [7,0], grid), Knight.new(:white, [7, 1], grid),
+            Bishop.new(:white, [7, 2], grid), Queen.new(:white, [7,3], grid),
+            King.new(:white, [7, 4], grid), Bishop.new(:white, [7,5], grid),
+            Knight.new(:white, [7, 6], grid), Rook.new(:white, [7,7], grid)]
+
+
+    8.times do |i|
+
+      wteam << Pawn.new(:white, [6, i], grid)
+
+    end
+
+    [bteam, wteam]
+
   end
 
 #   def assess_grid
