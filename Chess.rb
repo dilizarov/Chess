@@ -78,7 +78,7 @@ class Piece
   end
 
   def path(final_position) #Refactor later
-    #return nil unless within_board?(final_position)
+    return nil unless within_board?(final_position)
 
     path = []
 
@@ -90,8 +90,8 @@ class Piece
     delta_x == 0 ? v_step = 0 : v_step = (delta_x / delta_x.abs)
     delta_y == 0 ? h_step = 0 : h_step = (delta_y / delta_y.abs)
 
-    v_step = delta_x if delta_x.abs == 2
-    h_step = delta_y if delta_y.abs == 2
+    # v_step = delta_x if delta_x.abs == 2
+#     h_step = delta_y if delta_y.abs == 2
 
     i = position[0]
     j = position[1]
@@ -110,11 +110,11 @@ class Piece
 
   end
 
-  # def intervening_piece?(final_position)
- #    path = self.path(final_destination)[0...-1]
- #    return true if path == nil
- #    path.any? { |point| grid[path[0]][path[1]].is_a?(Piece) }
- #  end
+   def intervening_piece?(final_position)
+     path = self.path(final_position)[0...-1]
+     return true if path == nil
+     path.any? { |point| grid[point[0]][point[1]].is_a?(Piece) }
+   end
 
   def own_king_checked?
 
@@ -122,8 +122,8 @@ class Piece
 
   def within_board?(final_position)
     row = final_position[0]
-    column = final_position[0]
-    row.between?(0,7) && column.between?(0,7)
+    column = final_position[1]
+    (row.between?(0,7) && column.between?(0,7))
   end
 
 end
@@ -176,6 +176,11 @@ class King < Piece
 end
 
 class Pawn < Piece
+
+  def path_permissible?(delta_x, delta_y)
+    return true
+  end
+
   def to_s
     "P"
   end
