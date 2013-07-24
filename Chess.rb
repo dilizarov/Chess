@@ -86,12 +86,10 @@ class Piece
     delta_y = final_position[1] - position[1]
 
     return nil unless path_permissible?(delta_x, delta_y)
+    return [final_position] if self.is_a?(Knight)
 
     delta_x == 0 ? v_step = 0 : v_step = (delta_x / delta_x.abs)
     delta_y == 0 ? h_step = 0 : h_step = (delta_y / delta_y.abs)
-
-    # v_step = delta_x if delta_x.abs == 2
-#     h_step = delta_y if delta_y.abs == 2
 
     i = position[0]
     j = position[1]
