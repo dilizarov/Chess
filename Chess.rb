@@ -78,7 +78,7 @@ class Piece
   end
 
   def path(final_position) #Refactor later
-    return nil unless within_board?(final_position)
+    #return nil unless within_board?(final_position)
 
     path = []
 
@@ -87,8 +87,8 @@ class Piece
 
     return nil unless path_permissible?(delta_x, delta_y)
 
-    delta_x == 0 ? v_step = 0 : v_step = (delta_x/delta_x.abs)
-    delta_y == 0 ? h_step = 0 : h_step = (delta_y/delta_y.abs)
+    delta_x == 0 ? v_step = 0 : v_step = (delta_x / delta_x.abs)
+    delta_y == 0 ? h_step = 0 : h_step = (delta_y / delta_y.abs)
 
     v_step = delta_x if delta_x.abs == 2
     h_step = delta_y if delta_y.abs == 2
@@ -102,15 +102,19 @@ class Piece
       j += h_step
     end
 
+    path
+
   end
 
   def execute_move?
 
   end
 
-  def intervening_piece?
-
-  end
+  # def intervening_piece?(final_position)
+ #    path = self.path(final_destination)[0...-1]
+ #    return true if path == nil
+ #    path.any? { |point| grid[path[0]][path[1]].is_a?(Piece) }
+ #  end
 
   def own_king_checked?
 
@@ -127,7 +131,7 @@ end
 class Rook < Piece
 
   def path_permissible?(delta_x, delta_y)
-    (delta_y == 0) ^ (delta_x == 0)
+    ((delta_y == 0) ^ (delta_x == 0))
   end
 
   def to_s
