@@ -182,31 +182,21 @@ class Pawn < Piece
 
   def path_permissible?(delta_x, delta_y)
 
-    final_position = [position[0] + delta_x, position[1] + delta_y]
+    deltas = [delta_x, delta_y]
 
-    return false unless delta_y.between?(-1,1)
-
-    #Deal with black color
     if self.color == :black
-
-
       if at_home_row?
-        return false unless delta_x.between?(1, 2)
+        [[1,0], [2,0], [1,1], [1,-1]].include?(deltas)
       else
-        return false unless delta_x == 1
+        [[1,0], [1,1], [1,-1]].include?(deltas)
       end
-
     elsif self.color == :white
-
       if at_home_row?
-        return false unless delta_x.between?(-2, -1)
+        [[-1,0], [-2,0], [-1,1], [-1,-1]].include?(deltas)
       else
-        return false unless delta_x == -1
+        [[-1,0], [-1,1], [-1,-1]].include?(deltas)
       end
     end
-
-    true
-
   end
 
   def at_home_row?
