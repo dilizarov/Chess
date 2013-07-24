@@ -54,10 +54,6 @@ class Board
     return
   end
 
-  def square_occupied?(row, col) #until test out, keep parameters
-    self[row, col].is_a?(Piece)
-  end
-
   def [](row, col)
     @grid[row][col]
   end
@@ -91,8 +87,7 @@ class Piece
     delta_x == 0 ? v_step = 0 : v_step = (delta_x / delta_x.abs)
     delta_y == 0 ? h_step = 0 : h_step = (delta_y / delta_y.abs)
 
-    i = position[0]
-    j = position[1]
+    i, j = position
 
     until path.include?(final_position)
       path << [i + v_step, j + h_step]
@@ -118,10 +113,21 @@ class Piece
 
   end
 
+  def destination_friend?(final_position)
+    return false unless square_occupied?(final_position)
+    row, column = final_position
+    grid[row][column].color == self.color
+
+  end
+
   def within_board?(final_position)
-    row = final_position[0]
-    column = final_position[1]
+    row, column = final_position
     (row.between?(0,7) && column.between?(0,7))
+  end
+
+  def square_occupied?(final_position) #until test out, keep parameters
+    row, column = final_position
+    grid[row][column].is_a?(Piece)
   end
 
 end
