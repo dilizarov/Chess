@@ -67,7 +67,7 @@ class Board
 end
 
 class Piece
-  attr_accessor :color, :position, :grid
+  attr_accessor :color, :position, :grid# reformat later to include :final_position
 
   def initialize(color, position, grid)
     @color, @position, @grid = color, position, grid
@@ -103,7 +103,7 @@ class Piece
 
   end
 
-   def intervening_piece?(final_position)
+   def intervening_piece?(final_position) #works
      path = self.path(final_position)[0...-1]
      return true if path == nil
      path.any? { |point| grid[point[0]][point[1]].is_a?(Piece) }
@@ -113,19 +113,18 @@ class Piece
 
   end
 
-  def destination_friend?(final_position)
-    return false unless square_occupied?(final_position)
+  def destination_friend?(final_position) #works
+    return nil unless square_occupied?(final_position)
     row, column = final_position
     grid[row][column].color == self.color
-
   end
 
-  def within_board?(final_position)
+  def within_board?(final_position) #works
     row, column = final_position
     (row.between?(0,7) && column.between?(0,7))
   end
 
-  def square_occupied?(final_position) #until test out, keep parameters
+  def square_occupied?(final_position) ##works
     row, column = final_position
     grid[row][column].is_a?(Piece)
   end
@@ -182,8 +181,39 @@ end
 class Pawn < Piece
 
   def path_permissible?(delta_x, delta_y)
-    return true
+
+    final_position = [position[0] + delta_x, position[1] + delta_y]
+
+    return false unless delta_y.between?(-1,1)
+
+    #Deal with black color
+    if self.color == :black
+
+
+      if at_home_row?
+        return false unless delta_x.between?(1, 2)
+      else
+        return false unless delta_x == 1
+      end
+
+    elsif self.color == :white
+
+      if at_home_row?
+        return false unless delta_x.between?(-2, -1)
+      else
+        return false unless delta_x == -1
+      end
+    end
+
+    true
+
   end
+
+  def at_home_row?
+    color == :black ? position[0] == 1 : position[0] == 6
+  end
+
+
 
   def to_s
     "P"
