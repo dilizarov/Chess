@@ -1,35 +1,35 @@
-class Array
-
-  # def deep_dup
-    #   # Argh! Mario and Kriti beat me with a one line version?? Must
-    #   # have used `inject`...
-    #   new_array = []
-    #   self.each do |el|
-    #     if el.is_a?(Array)
-    #       new_array << el.deep_dup
-    #     else
-    #       new_array << el
-    #     end
-    #   end
-    #
-    #   new_array
-    # end
-
-  def deep_dup
-    # board = Board.new
-    new_array = []
-    self.each do |el|
-      if el.is_a?(Array)
-        new_array << el.deep_dup
-      else
-        new_array << el.dup # Later: el.dup
-      end
-    end
-
-    new_array
-  end
-
-end
+# class Array
+#
+#   # def deep_dup
+#     #   # Argh! Mario and Kriti beat me with a one line version?? Must
+#     #   # have used `inject`...
+#     #   new_array = []
+#     #   self.each do |el|
+#     #     if el.is_a?(Array)
+#     #       new_array << el.deep_dup
+#     #     else
+#     #       new_array << el
+#     #     end
+#     #   end
+#     #
+#     #   new_array
+#     # end
+#
+#   def deep_dup
+#     # board = Board.new
+#     new_array = []
+#     self.each do |el|
+#       if el.is_a?(Array)
+#         new_array << el.deep_dup
+#       else
+#         new_array << el.dup # Later: el.dup
+#       end
+#     end
+#
+#     new_array
+#   end
+#
+# end
 
 class Board
 
@@ -58,17 +58,6 @@ class Board
 
     grid
   end
-#   def assess_grid
-#     @pieces = []
-#     # @grid.each_index do |row|
-# #       row.each_index do |col|
-# #         square = @grid[row][col]
-# #        @pieces << square unless square.nil?
-# #       end
-# #     end
-#     @grid.flatten.each
-#
-#   end
 
   def to_s
     print '  '
@@ -90,21 +79,24 @@ class Board
     @grid[row][col]
   end
 
-  def initialize
-    @grid = Board.generate_board
-    #@pieces = self.assess_grid
+  def initialize(n = 'new')
+    if n == 'new'
+      @grid = Board.generate_board
+    else
+      @grid = Array.new { ['*'] * 8 }
+    end
   end
 
-  def deep_dup
-    boardcopy = Board.new
-    boardcopy.grid = self.grid.deep_dup
-
-    boardcopy.grid.flatten.select do |el|
-      el.is_a?(Piece)
-    end.each { |piece| piece.grid = boardcopy.grid }
-
-    boardcopy
-  end
+  # def deep_dup
+#     boardcopy = Board.new
+#     boardcopy.grid = self.grid.deep_dup
+#
+#     boardcopy.grid.flatten.select do |el|
+#       el.is_a?(Piece)
+#     end.each { |piece| piece.grid = boardcopy.grid }
+#
+#     boardcopy
+#   end
 
 end
 
@@ -189,7 +181,6 @@ class Piece
   def own_king_checked?
     p team[:white]
     p team[:black]
-    future = grid.dup
 
     if team[:white].include?(self)
       return (team[:black].any? { |piece| piece.path_clear?(team[:whiteking].position) })
@@ -217,9 +208,20 @@ class Piece
   end
 
   def save_the_day?(final_position)
-    board = grid.dup
+    boardcopy = Board.new('la')
+    x, y = final_position
+    p grid
+    8.times do |i|
+      8.times do |j|
+        p i
+        boardcopy.grid[i][j] = (grid[i][j]).dup
+        p i
+        boardcopy.grid[i][j].grid = boardcopy.grid
+      end
+    end
 
-    self.move(final_position)
+    boardcopy.grid[position[0]][position[1]].move(final_position)
+    boardcopy.grid[x][y].own_king_checked?
   end
 
 
