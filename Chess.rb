@@ -1,6 +1,39 @@
+class Array
+
+  # def deep_dup
+    #   # Argh! Mario and Kriti beat me with a one line version?? Must
+    #   # have used `inject`...
+    #   new_array = []
+    #   self.each do |el|
+    #     if el.is_a?(Array)
+    #       new_array << el.deep_dup
+    #     else
+    #       new_array << el
+    #     end
+    #   end
+    #
+    #   new_array
+    # end
+
+  def deep_dup
+    # board = Board.new
+    new_array = []
+    self.each do |el|
+      if el.is_a?(Array)
+        new_array << el.deep_dup
+      else
+        new_array << el.dup # Later: el.dup
+      end
+    end
+
+    new_array
+  end
+
+end
+
 class Board
 
-  attr_reader :grid #:pieces
+  attr_accessor :grid #:pieces
 
   def Board.generate_board
     grid = (0...8).map { ['*'] * 8 }
@@ -25,7 +58,6 @@ class Board
 
     grid
   end
-
 #   def assess_grid
 #     @pieces = []
 #     # @grid.each_index do |row|
@@ -63,6 +95,16 @@ class Board
     #@pieces = self.assess_grid
   end
 
+  def deep_dup
+    boardcopy = Board.new
+    boardcopy.grid = self.grid.deep_dup
+
+    boardcopy.grid.flatten.select do |el|
+      el.is_a?(Piece)
+    end.each { |piece| piece.grid = boardcopy.grid }
+
+    boardcopy
+  end
 
 end
 
@@ -71,6 +113,19 @@ class Piece
 
   def initialize(color, position, grid)
     @color, @position, @grid = color, position, grid
+  end
+
+
+  def team
+
+    @teams = Hash.new()
+    @teams[:black] = @grid.flatten.select { |piece| piece != '*' && piece.color == :black }
+    @teams[:white] = @grid.flatten.select { |piece| piece != '*' && piece.color == :white }
+    @teams[:blackking] = @teams[:black].select { |piece| piece.is_a?(King) }.first
+    @teams[:whiteking] = @teams[:white].select { |piece| piece.is_a?(King) }.first
+
+    @teams
+
   end
 
   def path(final_position) #Refactor later
@@ -116,6 +171,7 @@ class Piece
     return false unless within_board?(final_position)
     return false if intervening_piece?(final_position)
     return false if destination_friend?(final_position)
+    return false if own_king_checked?# unless save_the_day?(final_position)
 
     true
   end
@@ -126,8 +182,22 @@ class Piece
      path.any? { |point| grid[point[0]][point[1]].is_a?(Piece) }
    end
 
-  def own_king_checked?
+   def path_clear?(final_position)
+     !(intervening_piece?(final_position))
+   end
 
+  def own_king_checked?
+    p team[:white]
+    p team[:black]
+    future = grid.dup
+
+    if team[:white].include?(self)
+      return (team[:black].any? { |piece| piece.path_clear?(team[:whiteking].position) })
+    elsif team[:black].include?(self)
+      return (team[:white].any? { |piece| piece.path_clear?(team[:blackking].position) })
+    end
+
+    false
   end
 
   def destination_friend?(final_position) #works
@@ -145,6 +215,13 @@ class Piece
     row, column = final_position
     grid[row][column].is_a?(Piece)
   end
+
+  def save_the_day?(final_position)
+    board = grid.dup
+
+    self.move(final_position)
+  end
+
 
 end
 
