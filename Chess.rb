@@ -38,37 +38,59 @@ class Board
   def Board.generate_board
     grid = (0...8).map { ['*'] * 8 }
 
-    grid[0] = [Rook.new(:black, [0,0], grid), Knight.new(:black, [0, 1], grid),
-                Bishop.new(:black, [0, 2], grid), Queen.new(:black, [0,3], grid),
-                King.new(:black, [0, 4], grid), Bishop.new(:black, [0,5], grid),
-                Knight.new(:black, [0, 6], grid), Rook.new(:black, [0,7], grid)]
+    teams = make_teams(grid)
 
-    grid[7] = [Rook.new(:white, [7,0], grid), Knight.new(:white, [7, 1], grid),
-                Bishop.new(:white, [7, 2], grid), Queen.new(:white, [7,3], grid),
-                King.new(:white, [7, 4], grid), Bishop.new(:white, [7,5], grid),
-                Knight.new(:white, [7, 6], grid), Rook.new(:white, [7,7], grid)]
+    grid[0] = 8.times.map { |i| teams[0][i] }
 
-    grid[1].each_index do |i|
-      grid[1][i] = Pawn.new(:black, [1, i], grid)
+    grid[7] = 8.times.map { |i| teams[1][i] }
+
+    grid[1] = (8...16).map { |i| teams[0][i] }
+
+    grid[6] = (8...16).map { |i| teams[1][i] }
+
+    [grid, teams]
+  end
+
+  def Board.make_teams(grid)
+
+    bteam = [Rook.new(:black, [0,0], grid), Knight.new(:black, [0, 1], grid),
+            Bishop.new(:black, [0, 2], grid), Queen.new(:black, [0,3], grid),
+            King.new(:black, [0, 4], grid), Bishop.new(:black, [0,5], grid),
+            Knight.new(:black, [0, 6], grid), Rook.new(:black, [0,7], grid)]
+
+    8.times do |i|
+
+      bteam << Pawn.new(:black, [1, i], grid)
+
     end
 
-    grid[6].each_index do |i|
-      grid[6][i] = Pawn.new(:white, [6, i], grid)
+
+    wteam = [Rook.new(:white, [7,0], grid), Knight.new(:white, [7, 1], grid),
+            Bishop.new(:white, [7, 2], grid), Queen.new(:white, [7,3], grid),
+            King.new(:white, [7, 4], grid), Bishop.new(:white, [7,5], grid),
+            Knight.new(:white, [7, 6], grid), Rook.new(:white, [7,7], grid)]
+
+
+    8.times do |i|
+
+      wteam << Pawn.new(:white, [6, i], grid)
+
     end
 
-    grid
+    [bteam, wteam]
+
   end
 
   def to_s
     print '  '
-    (0...@grid.length).each { |i| print i.to_s(8) + " " }
+    (0...@grid[0].length).each { |i| print i.to_s(8) + " " }
 
     puts ""
-    @grid.flatten.each_with_index do |piece, i|
-      print (i /@grid.length).to_s(8) + " " if (i % @grid.length == 0)
+    @grid[0].flatten.each_with_index do |piece, i|
+      print (i /@grid[0].length).to_s(8) + " " if (i % @grid[0].length == 0)
 
       print piece.to_s + " "
-      puts "" if (i + 1) % @grid.length == 0
+      puts "" if (i + 1) % @grid[0].length == 0
 
     end
 
@@ -76,7 +98,7 @@ class Board
   end
 
   def [](row, col)
-    @grid[row][col]
+    @grid[0][row][col]
   end
 
   def initialize(n = 'new')
@@ -104,7 +126,12 @@ class Piece
   attr_accessor :color, :position, :grid# reformat later to include :final_position
 
   def initialize(color, position, grid)
-    @color, @position, @grid = color, position, grid
+    @color, @position, @grid = color, position, grid[0]
+    @teams = { :black => grid[1][0],
+               :white => grid[1][1],
+               :blackking => grid[1][0][4],
+               :whiteking => grid[1][1][4]
+             }
   end
 
 
@@ -151,8 +178,11 @@ class Piece
   end
 
   def move(final_position)
+    p final_position
     if execute_move?(final_position)
+      p @grid
       @grid[final_position[0]][final_position[1]] = @grid[position[0]][position[1]]
+      @grid[position[0]][position[1]]
       @grid[position[0]][position[1]] = '*'
       @position = final_position # MH
     end
